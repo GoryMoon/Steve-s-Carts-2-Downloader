@@ -4,3 +4,13 @@
 *.jar
 *.war
 *.ear
+/bin/gory_moon/stevescarts2/downloader/resources/SC2D.xml
+
+/.classpath
+/.project
+/.settings/org.eclipse.jdt.core.prefs
+/.settings/org.eclipse.ltk.core.refactoring.prefs
+/Build_Skol.xml
+
+/bin/gory_moon/stevescarts2/downloader/Frame.form
+/bin/logo.png
