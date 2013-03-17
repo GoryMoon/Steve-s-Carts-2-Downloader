@@ -204,7 +204,7 @@ public class Main {
     }
     
     public static String changlogHandler(String[] changelog, String id){
-        String print = "Change Log:\n";
+        String print = "ChangeLog:\n";
         String logId = id.replace("a", "");
         version = Integer.parseInt(logId);
         int versionjump = 0;

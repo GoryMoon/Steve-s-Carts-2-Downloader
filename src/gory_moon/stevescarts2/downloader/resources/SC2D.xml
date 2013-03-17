@@ -1,7 +1,7 @@
 <SC2DXML>
 	<!--Steve's Carts 2 Downloader Verison-->
 	<version>
-        <v>1.3.6</v>
+        <v>1.3.7</v>
     </version>
     <!--Steve's Carts 2 Downloader Exeptions . = ; , = $ \' = £ \"= §-->
     <exeption>
@@ -32,10 +32,15 @@
     	<orginal>modifying,</orginal>
     	<replacement>modifying$</replacement>
     </exeption>
+    <exeption>
+    	<orginal>Note Sequencer,</orginal>
+    	<replacement>Note Sequencer$</replacement>
+    </exeption>
     <!--Version Exeptions-->
     <versionexeption>
 		<version>50</version>
     </versionexeption>
     <versionexeption>
-    	<version>59</version></versionexeption>
+    	<version>59</version>
+    </versionexeption>
 </SC2DXML>
