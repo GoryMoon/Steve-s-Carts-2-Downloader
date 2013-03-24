@@ -1,13 +1,13 @@
 <SC2DXML>
 	<!--Steve's Carts 2 Downloader Verison-->
 	<version>
-        <v>1.3.7</v>
+        <v>1.3.8</v>
     </version>
     <!--Steve's Carts 2 Downloader Exeptions . = ; , = $ \' = £ \"= §-->
     <exeption>
         <orginal>\'</orginal>
         <replacement>£</replacement>
-       </exeption>
+    </exeption>
     <exeption>
         <orginal>StevesCarts.cfg</orginal>
         <replacement>StevesCarts;cfg</replacement>
@@ -35,6 +35,18 @@
     <exeption>
     	<orginal>Note Sequencer,</orginal>
     	<replacement>Note Sequencer$</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>Distributor,</orginal>
+    	<replacement>Distributor$</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>liquid storage,</orginal>
+    	<replacement>liquid storage$</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>MC 1.5</orginal>
+    	<replacement>MC 1;5</replacement>
     </exeption>
     <!--Version Exeptions-->
     <versionexeption>
