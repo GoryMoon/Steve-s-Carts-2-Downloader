@@ -1,7 +1,7 @@
 <SC2DXML>
 	<!--Steve's Carts 2 Downloader Verison-->
 	<version>
-        <v>1.3.8</v>
+        <v>1.4.0</v>
     </version>
     <!--Steve's Carts 2 Downloader Exeptions . = ; , = $ \' = £ \"= §-->
     <exeption>
@@ -47,6 +47,22 @@
     <exeption>
     	<orginal>MC 1.5</orginal>
     	<replacement>MC 1;5</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>servers.</orginal>
+    	<replacement>servers;</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>screen,</orginal>
+    	<replacement>screen$</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>anymore.</orginal>
+    	<replacement>anymore;</replacement>
+    </exeption>
+    <exeption>
+    	<orginal>it,</orginal>
+    	<replacement>it$</replacement>
     </exeption>
     <!--Version Exeptions-->
     <versionexeption>

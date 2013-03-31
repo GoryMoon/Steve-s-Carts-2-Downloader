@@ -156,6 +156,9 @@ public class Frame extends javax.swing.JFrame implements Observer {
                 }
             }
         }
+        if(mcV.contains("andabove")) {
+        	mcV = mcV.replace("andabove", "+");
+        }
         jLabel15.setText(mcV);
     }
     
