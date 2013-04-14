@@ -187,6 +187,10 @@ public class Frame extends javax.swing.JFrame implements Observer {
     }
     
     private void error(String e){
+    	error(e, null);
+    }
+    
+    private void error(String e, Exception exception){
         if(!errorHappend){
             errorHappend = true;
             hasInternet = false;
@@ -197,13 +201,21 @@ public class Frame extends javax.swing.JFrame implements Observer {
             jComboBox1.removeAllItems();
             jComboBox1.addItem(makeObj("No Versions Avalible"));
             jComboBox1.setSelectedIndex(0);
+            jComboBox1.setEnabled(false);
             jTextArea1.setAutoscrolls(false);
             jTextArea1.setText("No Changelog Avalible");
             jButton1.setEnabled(false);
             try {
                 FileWriter errorFile = new FileWriter("Steve's Carts 2 Downloader Crash Log "+getDateTime()+".txt");
                 BufferedWriter out = new BufferedWriter(errorFile);
-                out.write(e);
+                out.write(e + "\n\n");
+                if ( exception != null){
+                	out.write(exception.toString() + "\n");
+                	for(StackTraceElement ex : exception.getStackTrace()){
+                		out.write("\n" + ex.toString());
+                	}
+                	
+                }
                 out.close();
                 resetStats();
                 Main.sendMessage("An unexpected error oucurred! Send the \"Steve's Carts 2 Downloader Crash Log "+getDateTime()+".txt\" to \"Gory_Moon\" at www.stevescarts2.wikispaces.com", "Error");
@@ -519,7 +531,7 @@ public class Frame extends javax.swing.JFrame implements Observer {
 	public void update(Observable arg0, Object arg1) {
             if(selectedDownload.getStatus() == DOWNLOADERROR){
                 if(selectedDownload.getErrorCode().equals(Download.EDOWNLOADFAILED)){
-                    error(selectedDownload.getErrorCode()+selectedDownload.getUrl());
+                    error(selectedDownload.getErrorCode()+selectedDownload.getUrl(), Download.getEXCEPTION());
                 }else{
                     error(selectedDownload.getErrorCode());
                 }

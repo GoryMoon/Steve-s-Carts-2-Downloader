@@ -25,6 +25,7 @@ public class Download extends Observable implements Runnable {
     public static final String ERESPONSE = "Error on getting response code";
     public static final String ECONLENGHT = "Connection lenght is to small";
     public static final String EDOWNLOADFAILED = "Error on downloading the file: ";
+    private static Exception EXCEPTION;
     
     private URL url; // download URL
     private int size; // size of download in bytes
@@ -100,9 +101,10 @@ public class Download extends Observable implements Runnable {
     }
     
     // Mark this download as having an error.
-    private void error(String i) {
+    private void error(String i, Exception e) {
         errorCode = i;
         status = ERROR;
+        EXCEPTION = e;
         stateChanged();
     }
     
@@ -137,13 +139,13 @@ public class Download extends Observable implements Runnable {
             
             // Make sure response code is in the 200 range.
             if (connection.getResponseCode() / 100 != 2) {
-                error(ERESPONSE);
+                error(ERESPONSE, null);
             }
             
             // Check for valid content length.
             int contentLength = connection.getContentLength();
             if (contentLength < 1) {
-                error(ECONLENGHT);
+                error(ECONLENGHT, null);
             }
             
       /* Set the size for this download if it
@@ -186,7 +188,7 @@ public class Download extends Observable implements Runnable {
                 stateChanged();
             }
         } catch (Exception e) {
-            error(EDOWNLOADFAILED);
+            error(EDOWNLOADFAILED, e);
         } finally {
             // Close file.
             if (file != null) {
@@ -209,4 +211,8 @@ public class Download extends Observable implements Runnable {
         setChanged();
         notifyObservers();
     }
+
+	public static Exception getEXCEPTION() {
+		return EXCEPTION;
+	}
 }
