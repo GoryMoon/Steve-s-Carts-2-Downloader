@@ -8,6 +8,7 @@
 
 /.classpath
 /.project
+/.gitignore
 /.settings/org.eclipse.jdt.core.prefs
 /.settings/org.eclipse.ltk.core.refactoring.prefs
 /Build_Skol.xml
@@ -15,3 +16,6 @@
 /bin/gory_moon/stevescarts2/downloader/Frame.form
 /bin/logo.png
 /Build_Main.xml
+/bin
+
+/template/SC2DV.xml.template
