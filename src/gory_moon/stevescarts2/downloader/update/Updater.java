@@ -2,7 +2,7 @@ package gory_moon.stevescarts2.downloader.update;
 
 import gory_moon.stevescarts2.downloader.Main;
 import gory_moon.stevescarts2.downloader.core.Download;
-import gory_moon.stevescarts2.downloader.helper.DebugHelper;
+import gory_moon.stevescarts2.downloader.core.helper.DebugHelper;
 
 import java.io.*;
 import java.net.URL;
