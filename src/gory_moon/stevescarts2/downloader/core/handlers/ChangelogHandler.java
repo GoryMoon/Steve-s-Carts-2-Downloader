@@ -1,4 +1,4 @@
-package gory_moon.stevescarts2.downloader.core.hadlers;
+package gory_moon.stevescarts2.downloader.core.handlers;
 
 import gory_moon.stevescarts2.downloader.core.helper.DebugHelper;
 
