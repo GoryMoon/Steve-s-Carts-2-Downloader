@@ -1,5 +1,6 @@
 package gory_moon.stevescarts2.downloader.core.handlers;
 
+import gory_moon.stevescarts2.downloader.core.ExceptionThread;
 import gory_moon.stevescarts2.downloader.core.helper.DebugHelper;
 
 public class ChangelogHandler {
@@ -17,6 +18,7 @@ public class ChangelogHandler {
 	public ChangelogHandler(ExceptionsHandler exHand){
 		exceptions = exHand.getExeptions();
 		vexceptions = exHand.getVexeptions();
+		ExceptionThread.isDone = true;
 	}
 	
 	public String changlogHandler(String[] changelog, String id){

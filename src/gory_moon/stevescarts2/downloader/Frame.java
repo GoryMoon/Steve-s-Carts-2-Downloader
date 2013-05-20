@@ -1,9 +1,11 @@
 package gory_moon.stevescarts2.downloader;
 
 import gory_moon.stevescarts2.downloader.core.Download;
+import gory_moon.stevescarts2.downloader.core.ExceptionThread;
 import gory_moon.stevescarts2.downloader.core.GetUpdates;
-import gory_moon.stevescarts2.downloader.core.hadlers.ChangelogHandler;
-import gory_moon.stevescarts2.downloader.core.hadlers.ExceptionsHandler;
+import gory_moon.stevescarts2.downloader.core.StartupSimulator;
+import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
+import gory_moon.stevescarts2.downloader.core.handlers.ExceptionsHandler;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,8 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -30,12 +30,23 @@ import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.LayoutStyle;
+import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 
 /**
  * @author Gory_Moon
  */
-public class Frame extends javax.swing.JFrame implements Observer {
+public class Frame extends JFrame implements Observer {
     
     private static final long serialVersionUID = 1L;
     String[] items = {"No Changelog Avalible"};
@@ -58,20 +69,29 @@ public class Frame extends javax.swing.JFrame implements Observer {
 	private boolean exeptionset = false;
 	private int itemlenght = 0;
 	
+	private Thread startsimT;
+	private Thread excT;
+	private StartupSimulator startsim;
+	private ExceptionThread exceptionT;
 	private static ChangelogHandler changelogHandler;
     private static ExceptionsHandler exceptionsHandler;
-	
-    /**
-     * Creates new form Frame
-     */
-    public Frame() {
-    	initComponents();
-        setLocationRelativeTo(null);
+    
+    public void runMain(){ 
         hasInternet = Main.gethasInternet();
+        
     	if(hasInternet){
 	        if(firstrun){
-	        	exceptionsHandler = new ExceptionsHandler();
-	        	changelogHandler = new ChangelogHandler(exceptionsHandler);
+	        	exceptionT = new ExceptionThread();
+	        	excT = new Thread(exceptionT);
+	        	excT.start();
+	        	
+	        	while(ExceptionThread.isDone == false){try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}}
+	        	
+	        	exceptionsHandler = exceptionT.getExceptionsHandler();
+	        	changelogHandler = exceptionT.getChangelogHandler();
 	        	vexep = exceptionsHandler.getVexeptions();
 	            try {
 	                items = GetUpdates.getWebArray();
@@ -104,22 +124,63 @@ public class Frame extends javax.swing.JFrame implements Observer {
                     List<String> list = Arrays.asList(items);
                     Collections.reverse(list);
                     log = (String[]) list.toArray();
+                    
                     setVersionArray(GetUpdates.getMCVersion());
                     //log = removeEmpty(log);
-                        
+                    
+                    startsim.isRunning = false;
 	                jComboBox1.setSelectedIndex(0);
 	                firstrun = false;
 	                changeLog();
                     setMcVersion(GetUpdates.getMCVersion());
-	            } catch (MalformedURLException ex) {
-                        error(ex.toString());
-	            } catch (IOException ex) {
-                        error(ex.toString());
-                    }
+                } catch (Exception e) {
+                	error(e.toString());
+				}
 	        }
     	}else{
     		noInternet();
     	}
+    }
+    
+    /**
+     * Creates new form Frame
+     * @param startsim 
+     */
+    public Frame() {
+    	
+		/*
+         * Set the Nimbus look and feel
+         */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /*
+         * If Nimbus (introduced in Java SE 6) is not available, stay with the
+         * default look and feel. For details see
+         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+		initComponents();
+        setLocationRelativeTo(null);
+        setVisible(true);
+        startsim = new StartupSimulator();
+        startsimT = new Thread(startsim);
+        startsimT.start();
     }
     private Object makeObj(final String item)  {
         return new Object() {public String toString() { return item; } };
@@ -273,30 +334,30 @@ public class Frame extends javax.swing.JFrame implements Observer {
 
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<Object>();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
+        jButton1 = new JButton();
+        jButton2 = new JButton();
+        jComboBox1 = new JComboBox<Object>();
+        jScrollPane1 = new JScrollPane();
+        jTextArea1 = new JTextArea();
+        jProgressBar1 = new JProgressBar();
+        jLabel1 = new JLabel();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
+        jLabel4 = new JLabel();
+        jLabel5 = new JLabel();
+        jLabel6 = new JLabel();
+        jLabel7 = new JLabel();
+        jLabel8 = new JLabel();
+        jLabel9 = new JLabel();
+        jLabel10 = new JLabel();
+        jLabel11 = new JLabel();
+        jLabel14 = new JLabel();
+        jLabel15 = new JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Steve's Carts 2 Downloader "+Main.getDownloaderVersion());
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        setName("Window");
+        setName("SC2D");
         setResizable(false);
 
         jButton1.setText("Download");
@@ -373,99 +434,99 @@ public class Frame extends javax.swing.JFrame implements Observer {
 
         jLabel14.setText("Minecraft required:");
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 32, Short.MAX_VALUE)
                         .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jProgressBar1, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel8))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel9))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel10))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel11)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel14)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel15)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel15, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel14, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(7, 7, 7)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 126, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel7)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2)
                         .addGap(8, 8, 8))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(jLabel9))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(jLabel10))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
                             .addComponent(jLabel11))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addGap(27, 27, 27))))
         );
 
@@ -510,34 +571,7 @@ public class Frame extends javax.swing.JFrame implements Observer {
     /**
      * @param args the command line arguments
      */
-    public static void runFrame() {
-        /*
-         * Set the Nimbus look and feel
-         */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        }
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }        //</editor-fold>
-
+    public void runFrame() {
         /*
          * Create and display the form
          */
@@ -545,74 +579,82 @@ public class Frame extends javax.swing.JFrame implements Observer {
 
             @Override
             public void run() {
-                new Frame().setVisible(true);
+                Main.frame.runMain();
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<Object> jComboBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    // End of variables declaration//GEN-END:variables
+    private JButton jButton1;
+    private JButton jButton2;
+    private JComboBox<Object> jComboBox1;
+    private JLabel jLabel1;
+    private JLabel jLabel10;
+    private JLabel jLabel11;
+    private JLabel jLabel14;
+    private JLabel jLabel15;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JLabel jLabel6;
+    private JLabel jLabel7;
+    private JLabel jLabel8;
+    private JLabel jLabel9;
+    private JProgressBar jProgressBar1;
+    private JScrollPane jScrollPane1;
+    private JTextArea jTextArea1;
+    
+    
 	@Override
 	public void update(Observable arg0, Object arg1) {
-            if(selectedDownload.getStatus() == DOWNLOADERROR){
-                if(selectedDownload.getErrorCode().equals(Download.EDOWNLOADFAILED)){
-                    error(selectedDownload.getErrorCode()+selectedDownload.getUrl(), Download.getEXCEPTION());
-                }else{
-                    error(selectedDownload.getErrorCode());
-                }
-                resetStats();
+		if(!firstrun){
+			System.out.println("Updating before intilized");
+		}
+        if(selectedDownload.getStatus() == DOWNLOADERROR){
+            if(selectedDownload.getErrorCode().equals(Download.EDOWNLOADFAILED)){
+                error(selectedDownload.getErrorCode()+selectedDownload.getUrl(), Download.getEXCEPTION());
             }else{
-                String ext = "b";
-                int size = (int)Math.ceil(((double)selectedDownload.getSize()));
-                int done = (int)Math.ceil(((double)selectedDownload.getDownloaded()));
-                int left = (int)Math.ceil((((double)selectedDownload.getSize())-((double)selectedDownload.getDownloaded())));
-                if(size >= 4096){
-                    ext = "Kb";
+                error(selectedDownload.getErrorCode());
+            }
+            resetStats();
+        }else{
+            String ext = "b";
+            int size = (int)Math.ceil(((double)selectedDownload.getSize()));
+            int done = (int)Math.ceil(((double)selectedDownload.getDownloaded()));
+            int left = (int)Math.ceil((((double)selectedDownload.getSize())-((double)selectedDownload.getDownloaded())));
+            if(size >= 4096){
+                ext = "Kb";
+                size = (int)Math.ceil(((double)size)/1024);
+                done = (int)Math.ceil(((double)done)/1024);
+                left = (int)Math.ceil((((double)size)-((double)done)));
+                if (size >= 4096){
+                    ext = "Mb";
                     size = (int)Math.ceil(((double)size)/1024);
                     done = (int)Math.ceil(((double)done)/1024);
                     left = (int)Math.ceil((((double)size)-((double)done)));
-                    if (size >= 4096){
-                        ext = "Mb";
+                    if(size >= 4096){
+                        ext = "Gb";
                         size = (int)Math.ceil(((double)size)/1024);
                         done = (int)Math.ceil(((double)done)/1024);
                         left = (int)Math.ceil((((double)size)-((double)done)));
-                        if(size >= 4096){
-                            ext = "Gb";
-                            size = (int)Math.ceil(((double)size)/1024);
-                            done = (int)Math.ceil(((double)done)/1024);
-                            left = (int)Math.ceil((((double)size)-((double)done)));
-                        }
                     }
                 }
-                updateProgress(selectedDownload.getProgress(),selectedDownload.getStatus());
-                jLabel9.setText(size+ext);
-                jLabel10.setText(done+ext);
-                jLabel11.setText(left+ext);
-                
             }
+            updateProgress(selectedDownload.getProgress(),selectedDownload.getStatus());
+            jLabel9.setText(size+ext);
+            jLabel10.setText(done+ext);
+            jLabel11.setText(left+ext);
+            
+        }
 	}
 	public static ChangelogHandler getChangelogHandler() {
 		return changelogHandler;
 	}
 	public static ExceptionsHandler getExceptionsHandler() {
 		return exceptionsHandler;
+	}
+
+	public void displayBoxText(String l) {
+		jTextArea1.setText(l);
 	}
 }

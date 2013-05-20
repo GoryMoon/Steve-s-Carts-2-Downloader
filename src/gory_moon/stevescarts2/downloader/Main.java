@@ -1,7 +1,7 @@
 package gory_moon.stevescarts2.downloader;
 
-import gory_moon.stevescarts2.downloader.core.hadlers.ChangelogHandler;
-import gory_moon.stevescarts2.downloader.core.hadlers.VersionHandler;
+import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
+import gory_moon.stevescarts2.downloader.core.handlers.VersionHandler;
 import gory_moon.stevescarts2.downloader.update.Updater;
 
 import java.awt.Component;
@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 public class Main {
 
 	public static Main instance;
-	private static String SC2DV = "1.4.2";
+	private static String SC2DV = "1.5.0";
     private static boolean oldVersion = false;
     private static boolean isUpdating = false;
     private static boolean hasInternet = true;
@@ -26,6 +26,7 @@ public class Main {
     public static boolean debug = true;
     
     private static VersionHandler vHandler;
+    public static Frame frame = new Frame();
     
     public static void setNeedsUpdate(boolean needsUpdate) {
 		Main.needsUpdate = needsUpdate;
@@ -44,10 +45,10 @@ public class Main {
         }
         if(hasInternet){
         	vHandler = new VersionHandler();
+        	frame.setTitle("Steve's Carts 2 Downloader " + SC2DV);
             
             if(!needsUpdate){
-                Frame.runFrame();
-                removeUpdateFiles();
+                frame.runFrame();
             }else{
                 oldVersion = true;
                 int pick = JOptionPane.showConfirmDialog((Component) null, "A update is avalible.\nOnline Version: "+vHandler.getRemoteVersion()+"\nLocal Version: "+SC2DV+"\nDo you want to download it now?",
@@ -57,13 +58,11 @@ public class Main {
             if(isUpdating&&oldVersion){
                 new Updater();
             }else if(needsUpdate){
-                Frame.runFrame();
-                removeUpdateFiles();
+                frame.runFrame();
             }
         }else{
         	noInternet();
-        	removeUpdateFiles();
-        	Frame.runFrame();
+        	frame.runFrame();
         }
     }
     
