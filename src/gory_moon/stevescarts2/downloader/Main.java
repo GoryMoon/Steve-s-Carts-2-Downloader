@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 public class Main {
 
 	public static Main instance;
-	private static String SC2DV = "1.5.0";
+	private static String SC2DV = "1.5.1";
     private static boolean oldVersion = false;
     private static boolean isUpdating = false;
     private static boolean hasInternet = true;
