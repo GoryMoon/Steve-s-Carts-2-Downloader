@@ -26,7 +26,7 @@ public class Main {
     public static boolean debug = true;
     
     private static VersionHandler vHandler;
-    public static Frame frame = new Frame();
+    public static Frame frame;
     
     public static void setNeedsUpdate(boolean needsUpdate) {
 		Main.needsUpdate = needsUpdate;
@@ -34,6 +34,10 @@ public class Main {
 
     public Main(){
     	instance = this;
+    	
+    	SC2DV = VersionHandler.getLocalVersion();
+    	
+    	frame = new Frame();
     	
     	// TODO Rework the startup
     	removeUpdateFiles();

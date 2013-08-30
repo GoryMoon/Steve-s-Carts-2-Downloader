@@ -34,7 +34,7 @@ public class Updater implements Observer{
                 Main.sendMessage("Error with updating!\nTry again later.", "Error");
             }
         updater = new Download(url); 
-        updater.addObserver(Updater.this);
+        updater.addObserver(this);
     }
     
     public static final void copyInputStream(InputStream in, OutputStream out)
