@@ -1,5 +1,7 @@
 package gory_moon.stevescarts2.downloader.core;
 
+import gory_moon.stevescarts2.downloader.core.helper.Status;
+
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
@@ -12,16 +14,7 @@ public class Download extends Observable implements Runnable {
     // Max size of download buffer.
     private static final int MAX_BUFFER_SIZE = 1024;
     
-    // These are the status names.
-    public static final String STATUSES[] = {"Downloading",
-    "Paused", "Complete", "Cancelled", "Error"};
-    
     // These are the status codes.
-    public static final int DOWNLOADING = 0;
-    public static final int PAUSED = 1;
-    public static final int COMPLETE = 2;
-    public static final int CANCELLED = 3;
-    public static final int ERROR = 4;
     public static final String ERESPONSE = "Error on getting response code";
     public static final String ECONLENGHT = "Connection lenght is to small";
     public static final String EDOWNLOADFAILED = "Error on downloading the file: ";
@@ -30,7 +23,7 @@ public class Download extends Observable implements Runnable {
     private URL url; // download URL
     private int size; // size of download in bytes
     private int downloaded; // number of bytes downloaded
-    private int status; // current status of download
+    private Status status; // current status of download
     private String errorCode; // error code when ERROR status
     
     // Constructor for Download.
@@ -38,17 +31,15 @@ public class Download extends Observable implements Runnable {
         this.url = url;
         size = -1;
         downloaded = 0;
-        status = DOWNLOADING;
+        status = Status.DOWNLOADING;
         
         // Begin the download.
         download();
     }
     
     //Set status
-    public void setStatus(int i){
-        if(i<=4&&0<i){
-            status = i;
-        }
+    public void setStatus(Status s){
+        status = s;
     }
     
     // Get this download's URL.
@@ -77,33 +68,33 @@ public class Download extends Observable implements Runnable {
     }
     
     // Get this download's status.
-    public int getStatus() {
+    public Status getStatus() {
         return status;
     }
     
     // Pause this download.
     public void pause() {
-        status = PAUSED;
+        status = Status.PAUSED;
         stateChanged();
     }
     
     // Resume this download.
     public void resume() {
-        status = DOWNLOADING;
+        status = Status.DOWNLOADING;
         stateChanged();
         download();
     }
     
     // Cancel this download.
     public void cancel() {
-        status = CANCELLED;
+        status = Status.CANCELLED;
         stateChanged();
     }
     
     // Mark this download as having an error.
     private void error(String i, Exception e) {
         errorCode = i;
-        status = ERROR;
+        status = Status.ERROR;
         EXCEPTION = e;
         stateChanged();
     }
@@ -160,7 +151,7 @@ public class Download extends Observable implements Runnable {
             file.seek(downloaded);
             
             stream = connection.getInputStream();
-            while (status == DOWNLOADING) {
+            while (status == Status.DOWNLOADING) {
         /* Size buffer according to how much of the
            file is left to download. */
                 byte buffer[];
@@ -183,8 +174,8 @@ public class Download extends Observable implements Runnable {
             
       /* Change status to complete if this point was
          reached because downloading has finished. */
-            if (status == DOWNLOADING) {
-                status = COMPLETE;
+            if (status == Status.DOWNLOADING) {
+                status = Status.COMPLETE;
                 stateChanged();
             }
         } catch (Exception e) {
