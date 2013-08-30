@@ -83,8 +83,7 @@ public class Main {
 	}
     
     public static void removeUpdateFiles(){
-        new File("Steve%27s%20Carts%202%20Downloader.zip").delete();
-        new File("SC2DUpdater.zip").delete();
+        new File("Steve%27s%20Carts%202%20Downloader.jar").delete();
         new File("SC2DUpdater.jar").delete();
     }
     
