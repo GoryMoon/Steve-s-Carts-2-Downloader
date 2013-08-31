@@ -9,22 +9,23 @@ public class XMLHelper {
 
 	protected static Properties properties = new Properties();
 	protected InputStream repoStream = null;
+	protected String path;
 	
 	public XMLHelper(String path){
-		setProp(path);
+		this.path = path;
 	}
 
-	protected void setProp(String path) {
+	public XMLHelper setProp() {
 		try {
 			repoStream = Main.instance.getClass().getResourceAsStream(path);
 			properties.loadFromXML(repoStream);
 			repoStream.close();
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
+		return this;
 	}
 	
 	public String getXMLProps(String key) {
-		return properties.getProperty(key);
+		return properties == null ? null: properties.getProperty(key);
 	}
 
 	public String[] convertToArray(String c, String xmlProps) {

@@ -351,7 +351,6 @@ public class Frame extends JFrame implements Observer {
         jLabel15 = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Steve's Carts 2 Downloader "+Main.getDownloaderVersion());
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setName("SC2D");
         setResizable(false);
@@ -652,5 +651,9 @@ public class Frame extends JFrame implements Observer {
 
 	public void displayBoxText(String l) {
 		jTextArea1.setText(l);
+	}
+	
+	public StartupSimulator getStartsim() {
+		return startsim;
 	}
 }

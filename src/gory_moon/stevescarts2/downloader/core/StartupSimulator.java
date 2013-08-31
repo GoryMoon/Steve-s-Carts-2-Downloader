@@ -26,4 +26,13 @@ public class StartupSimulator implements Runnable{
 		}while (isRunning);
 	}
 
+	public void setText(String string) {
+		loading = string;
+		
+	}
+
+	public void addText(String string) {
+		loading += string;
+	}
+
 }

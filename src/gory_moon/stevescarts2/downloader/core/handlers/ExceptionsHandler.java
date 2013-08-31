@@ -15,7 +15,7 @@ public class ExceptionsHandler {
 	private final String XML_EXCEPTIONS = "https://dl.dropboxusercontent.com/u/65769242/Steves%20Carts%202%20Downloader/SC2DExceptions.xml";
     
     public ExceptionsHandler(){
-    	xmlHelper = new OnlineXMLHelper(XML_EXCEPTIONS);
+    	xmlHelper = (OnlineXMLHelper) new OnlineXMLHelper(XML_EXCEPTIONS).setProp();
     	setExceptions();
     	setVersionExceptions();
     }

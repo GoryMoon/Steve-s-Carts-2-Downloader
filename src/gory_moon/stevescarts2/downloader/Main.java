@@ -2,6 +2,7 @@ package gory_moon.stevescarts2.downloader;
 
 import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
 import gory_moon.stevescarts2.downloader.core.handlers.VersionHandler;
+import gory_moon.stevescarts2.downloader.core.helper.Version;
 import gory_moon.stevescarts2.downloader.update.Updater;
 
 import java.awt.Component;
@@ -17,7 +18,7 @@ import javax.swing.JOptionPane;
 public class Main {
 
 	public static Main instance;
-	private static String SC2DV = "1.5.1";
+	private static Version SC2DV;
     private static boolean oldVersion = false;
     private static boolean isUpdating = false;
     private static boolean hasInternet = true;
@@ -34,22 +35,24 @@ public class Main {
 
     public Main(){
     	instance = this;
-    	
-    	SC2DV = VersionHandler.getLocalVersion();
+    	vHandler = new VersionHandler();
+    	SC2DV = vHandler.getLocalVersion();
     	
     	frame = new Frame();
-    	
-    	// TODO Rework the startup
     	removeUpdateFiles();
     	
         try{
+        	frame.getStartsim().setText("Connecting to server");
             hasInternet = InetAddress.getByName("gorymoon.dx.am").isReachable(10000);
         } catch (IOException ex) {
+        	frame.getStartsim().addText(": Failed");
         	hasInternet = false;
         }
         if(hasInternet){
-        	vHandler = new VersionHandler();
-        	frame.setTitle("Steve's Carts 2 Downloader " + SC2DV);
+        	frame.getStartsim().addText(": Success\nChecking if updating is needed");
+        	needsUpdate = vHandler.getVersions().needsUpdate();
+        	frame.getStartsim().addText((needsUpdate ? ": Needs update\nChecking if should update": "Up to date\nLoading Exeptions"));
+        	frame.setTitle("SC 2 Downloader " + SC2DV);
             
             if(!needsUpdate){
                 frame.runFrame();
@@ -58,13 +61,16 @@ public class Main {
                 int pick = JOptionPane.showConfirmDialog((Component) null, "A update is avalible.\nOnline Version: "+vHandler.getRemoteVersion()+"\nLocal Version: "+SC2DV+"\nDo you want to download it now?",
                 "Updater", JOptionPane.YES_NO_OPTION);
                 isUpdating = (pick==0)?true:false;
+                frame.getStartsim().addText(isUpdating ? ": Updating": "Carrying on");
             }
-            if(isUpdating&&oldVersion){
+            if(isUpdating && oldVersion){
+            	frame.getStartsim().isRunning = false;
                 new Updater();
             }else if(needsUpdate){
                 frame.runFrame();
             }
         }else{
+        	frame.getStartsim().isRunning = false;
         	noInternet();
         	frame.runFrame();
         }
@@ -92,13 +98,8 @@ public class Main {
         name, JOptionPane.PLAIN_MESSAGE);
     }
     
-    //Get the Downloader version
     public static String getDownloaderVersion() {
-        return SC2DV;
-    }
-    
-    public static void setDownloaderVersion(String v) {
-        SC2DV = v;
+        return SC2DV.toString();
     }
     
     public static int getVersion(){
