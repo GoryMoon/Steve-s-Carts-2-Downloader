@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 public class Main {
 
 	public static Main instance;
-	private static String SC2DV = "1.5.0";
+	private static String SC2DV = "1.5.1";
     private static boolean oldVersion = false;
     private static boolean isUpdating = false;
     private static boolean hasInternet = true;
@@ -26,7 +26,7 @@ public class Main {
     public static boolean debug = true;
     
     private static VersionHandler vHandler;
-    public static Frame frame = new Frame();
+    public static Frame frame;
     
     public static void setNeedsUpdate(boolean needsUpdate) {
 		Main.needsUpdate = needsUpdate;
@@ -34,6 +34,10 @@ public class Main {
 
     public Main(){
     	instance = this;
+    	
+    	SC2DV = VersionHandler.getLocalVersion();
+    	
+    	frame = new Frame();
     	
     	// TODO Rework the startup
     	removeUpdateFiles();
@@ -79,8 +83,7 @@ public class Main {
 	}
     
     public static void removeUpdateFiles(){
-        new File("Steve%27s%20Carts%202%20Downloader.zip").delete();
-        new File("SC2DUpdater.zip").delete();
+        new File("Steve%27s%20Carts%202%20Downloader.jar").delete();
         new File("SC2DUpdater.jar").delete();
     }
     

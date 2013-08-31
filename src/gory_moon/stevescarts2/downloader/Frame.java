@@ -6,6 +6,7 @@ import gory_moon.stevescarts2.downloader.core.GetUpdates;
 import gory_moon.stevescarts2.downloader.core.StartupSimulator;
 import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
 import gory_moon.stevescarts2.downloader.core.handlers.ExceptionsHandler;
+import gory_moon.stevescarts2.downloader.core.helper.Status;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,12 +57,7 @@ public class Frame extends JFrame implements Observer {
     String[] log = {"No Changelog Avalible"};
     String[] versions = {"---"};
     String[] vexep = {""};
-    
-    public static final int DOWNLOADING = 0;
-    public static final int PAUSED = 1;
-    public static final int COMPLETE = 2;
-    public static final int CANCELLED = 3;
-    public static final int DOWNLOADERROR = 4;
+
     private static Download selectedDownload;
     private boolean errorHappend = false;
 	private int ChangelogChecks = 0;
@@ -274,8 +270,8 @@ public class Frame extends JFrame implements Observer {
             errorHappend = true;
             hasInternet = false;
             firstrun = true;
-            if(selectedDownload != null&& selectedDownload.getStatus()==Download.DOWNLOADING){
-                selectedDownload.setStatus(Download.CANCELLED);
+            if(selectedDownload != null&& selectedDownload.getStatus() == Status.DOWNLOADING){
+                selectedDownload.setStatus(Status.CANCELLED);
             }
             jComboBox1.removeAllItems();
             jComboBox1.addItem(makeObj("No Versions Avalible"));
@@ -323,10 +319,10 @@ public class Frame extends JFrame implements Observer {
         return sdf.format(date);
     }
     
-    private void updateProgress(float p, int i){
-    	if(i == COMPLETE){
+    private void updateProgress(float p, Status status){
+    	if(status == Status.COMPLETE){
             jButton1.setEnabled(true);
-    	}else if(i == DOWNLOADING){
+    	}else if(status == Status.DOWNLOADING){
             jLabel7.setText((int)p+"%");
             jProgressBar1.setValue((int)p);
     	}
@@ -610,9 +606,9 @@ public class Frame extends JFrame implements Observer {
 		if(!firstrun){
 			System.out.println("Updating before intilized");
 		}
-        if(selectedDownload.getStatus() == DOWNLOADERROR){
+        if(selectedDownload.getStatus() == Status.ERROR){
             if(selectedDownload.getErrorCode().equals(Download.EDOWNLOADFAILED)){
-                error(selectedDownload.getErrorCode()+selectedDownload.getUrl(), Download.getEXCEPTION());
+                error(selectedDownload.getErrorCode() + selectedDownload.getUrl(), Download.getEXCEPTION());
             }else{
                 error(selectedDownload.getErrorCode());
             }
