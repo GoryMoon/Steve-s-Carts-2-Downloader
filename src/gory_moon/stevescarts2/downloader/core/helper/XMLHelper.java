@@ -20,7 +20,7 @@ public class XMLHelper {
 			repoStream = Main.instance.getClass().getResourceAsStream(path);
 			properties.loadFromXML(repoStream);
 			repoStream.close();
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		return this;
 	}
 	

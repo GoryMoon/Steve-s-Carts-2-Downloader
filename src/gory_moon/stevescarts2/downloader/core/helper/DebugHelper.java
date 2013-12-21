@@ -23,10 +23,10 @@ public enum DebugHelper{
 		default:
 			message = "[INFO] "+message;
 		}
-		if(!Main.debug && type == DEBUG)
-			message = null;
-		else
+		if(type != DEBUG)
 			System.out.println(message);
-	}
+        else if (Main.debug)
+            System.out.println(message);
+    }
 
 }

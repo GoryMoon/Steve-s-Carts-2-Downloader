@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project Steves Carts 2 Downloader">
+
+    <property file="SC2DV.properties" prefix="SC2DV"/>
+    <property file="SC2DPaths.properties" prefix="PATHS"/>
+    <!-- ant-contrib is required -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${PATHS.ANT}"/>
+	</classpath>
+	</taskdef>
+	
+	<target name="create_run_jar">
+		<antcall target="copyLocalVersionFile" />
+        <jar destfile="${PATHS.DROPBOX}/Steve's Carts 2 Downloader.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="gory_moon.stevescarts2.downloader.Main"/>
+                <attribute name="Class-Path" value="."/>
+            	<attribute name="SplashScreen-Image" value="logo.png"/>
+            </manifest>
+            <fileset dir="bin"/>
+        	<fileset dir="">
+        		<include name="src/**"/>
+        		<exclude name="src/*.png"/>
+        	</fileset>
+        </jar>
+		
+		<xmlproperty file="${PATHS.DROPBOX}\SC2DVN.xml"/>
+		
+		<loadfile property="file" srcfile="${PATHS.DROPBOX}\SC2DV.txt" >
+		    		<filterchain>
+		    			<headfilter/>
+		    		</filterchain>
+		    	</loadfile>
+		
+		<if>
+			<equals arg1=" ${SC2DV.version}" arg2=" ${file}"/>
+			<then>
+				<echo level="info">Version File already up to date</echo>
+				<echo level="error">You didn't forgot to update the SC2DV.properties file?</echo>
+			</then>
+			<else>
+				<delete file="${PATHS.DROPBOX}\SC2DVN.xml" />
+				<delete file="${PATHS.DROPBOX}\SC2DV.txt" />
+				<echo file="${PATHS.DROPBOX}\SC2DV.txt">${SC2DV.version}</echo>
+				<antcall target="copyRemoteVersionFile" />
+		    	<echo level="info">Version File Updated</echo>
+				<echo level="info">New Version Updated successfully to: ${SC2DV.version}</echo>
+			</else>
+		</if>
+		
+    </target>
+	
+	<target name="copyRemoteVersionFile">
+		<copy file="template\SC2DV.xml.template" tofile="${PATHS.DROPBOX}\SC2DVN.xml">
+			<filterset>
+				<filter token="VERSION" value="${SC2DV.version}"/>
+				<filter token="SIDE" value="remote"/>
+			</filterset>
+		</copy>
+		<echo>Copied Remote Version File</echo>
+	</target>
+	
+	<target name="copyLocalVersionFile">
+		<delete file="src\gory_moon\stevescarts2\downloader\resources\SC2DV.xml" />
+		<delete file="bin\gory_moon\stevescarts2\downloader\resources\SC2DV.xml" />
+			
+		<copy file="template\SC2DV.xml.template" tofile="bin\gory_moon\stevescarts2\downloader\resources\SC2DV.xml">
+			<filterset>
+				<filter token="VERSION" value="${SC2DV.version}"/>
+				<filter token="SIDE" value="local"/>
+			</filterset>
+		</copy>
+		<copy file="template\SC2DV.xml.template" tofile="src\gory_moon\stevescarts2\downloader\resources\SC2DV.xml">
+			<filterset>
+				<filter token="VERSION" value="${SC2DV.version}"/>
+				<filter token="SIDE" value="local"/>
+			</filterset>
+		</copy>
+		<echo>Copied Local Version File to: ${SC2DV.version}</echo>
+	</target>
+	
+</project>

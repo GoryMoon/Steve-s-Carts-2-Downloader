@@ -15,7 +15,7 @@ public class OnlineXMLHelper extends XMLHelper {
 			repoStream = remoteVersionURL.openStream();
 			properties.loadFromXML(repoStream);
 			repoStream.close();
-		} catch (Exception e) {}
+		} catch (Exception ignored) {}
 		return this;
 	}
 

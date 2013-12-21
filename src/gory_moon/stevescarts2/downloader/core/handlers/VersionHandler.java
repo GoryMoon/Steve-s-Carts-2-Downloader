@@ -21,7 +21,7 @@ public class VersionHandler {
 		xmlLocalHelper = new XMLHelper(XML_LOCAL_VERSION);
 	}
 
-	private Version calculateVersion(String version) {
+	public static Version calculateVersion(String version) {
 		Version v = new Version();
 		
 		String[] val;
@@ -30,7 +30,7 @@ public class VersionHandler {
 		v.major = Integer.parseInt(val[0]);
 		if(Integer.parseInt(val[1]) != 0) v.minor = Integer.parseInt(val[1]);
 		if(val.length > 2 && Integer.parseInt(val[2]) != 0) v.fix = Integer.parseInt(val[2]);
-		if(val.length > 3 && val[3] != "dev0") v.dev = Integer.parseInt(val[3].replace("dev", ""));
+		if(val.length > 3 && !val[3].equals("dev0")) v.dev = Integer.parseInt(val[3].replace("dev", ""));
 		
 		return v;
 	}
