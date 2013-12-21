@@ -22,8 +22,17 @@ public class StartupSimulator implements Runnable{
 			Main.frame.displayBoxText(l);
 			try{
 				Thread.sleep(100);
-			} catch (Exception e){}
+			} catch (Exception ignored){}
 		}while (isRunning);
+	}
+
+	public void setText(String string) {
+		loading = string;
+		
+	}
+
+	public void addText(String string) {
+		loading += string;
 	}
 
 }

@@ -9,14 +9,14 @@ public class OnlineXMLHelper extends XMLHelper {
 	}
 	
 	@Override
-	protected void setProp(String path) {
+	public XMLHelper setProp() {
 		try {
 			URL remoteVersionURL = new URL(path);
 			repoStream = remoteVersionURL.openStream();
 			properties.loadFromXML(repoStream);
 			repoStream.close();
-		} catch (Exception e) {
-		}
+		} catch (Exception ignored) {}
+		return this;
 	}
 
 }
