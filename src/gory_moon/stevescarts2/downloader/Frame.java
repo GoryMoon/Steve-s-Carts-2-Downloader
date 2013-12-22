@@ -23,12 +23,14 @@ import java.util.Observer;
  */
 public class Frame extends JFrame implements Observer {
 
+    MainWindow mainWindow;
+
     ArrayList<VersionItem> items = new ArrayList<VersionItem>();
     Boolean firstrun = true;
     Boolean hasInternet = true;
 
-    private static Download selectedDownload;
-    private boolean errorHappend = false;
+    public static Download selectedDownload;
+    public boolean errorHappend = false;
 	private int ChangelogChecks = 0;
 
     private StartupSimulator startsim;
@@ -42,7 +44,7 @@ public class Frame extends JFrame implements Observer {
                 ExceptionThread exceptionT = new ExceptionThread();
                 Thread excT = new Thread(exceptionT);
 	        	excT.start();
-	        	
+
 	        	while(!ExceptionThread.isDone){
                     try {
 					    Thread.sleep(500);
@@ -54,14 +56,14 @@ public class Frame extends JFrame implements Observer {
 	                items = Main.getWebArray();
 
                     for (VersionItem item : items) {
-                        jComboBox1.addItem(makeObj(item));
+                        mainWindow.versionBox.addItem(makeObj(item));
                     }
-                    
+
                     startsim.isRunning = false;
-	                jComboBox1.setSelectedIndex(0);
+	                mainWindow.versionBox.setSelectedIndex(0);
 	                firstrun = false;
 	                changeLog();
-                    jButton1.setEnabled(true);
+                    mainWindow.downloadButton.setEnabled(true);
                 } catch (Exception e) {
                 	error(null, e);
 				}
@@ -70,37 +72,9 @@ public class Frame extends JFrame implements Observer {
     		noInternet();
     	}
     }
-    
-    /**
-     * Creates new form Frame
-     */
-    public Frame() {
-    	
-		/*
-         * Set the Nimbus look and feel
-         */
 
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            error(null, e);
-        } catch (UnsupportedLookAndFeelException e) {
-            error(null, e);
-        } catch (InstantiationException e) {
-            error(null, e);
-        } catch (IllegalAccessException e) {
-            error(null, e);
-        }
+    public Frame(MainWindow mainWindow) {
+        this.mainWindow = mainWindow;
 
         initComponents();
         setLocationRelativeTo(null);
@@ -113,27 +87,26 @@ public class Frame extends JFrame implements Observer {
         return new VersionItem(item) {public String toString() { return item.toString(); }};
     }
     
-    private void resetStats(){
-        jLabel7.setText("0%");
-        jLabel8.setText(null);
-        jLabel9.setText(null);
-        jLabel10.setText(null);
-        jLabel11.setText(null);
-        jProgressBar1.setValue(0);
+    public void resetStats(){
+        mainWindow.downloadVersion.setText(null);
+        mainWindow.fileSize.setText(null);
+        mainWindow.fileDone.setText(null);
+        mainWindow.fileLeft.setText(null);
+        mainWindow.downloadDoneBar.setValue(0);
     }
     
     private void setMcVersion(VersionItem item) {
         String mcV = item.getMcV();
     	
         mcV = mcV.replace("andabove", "+");
-        jLabel15.setText(mcV);
+        mainWindow.versionReq.setText(mcV);
     }
     
-    private void error(String e){
+    public void error(String e){
     	error(e, null);
     }
-    
-    private void error(String e, Exception exception){
+
+    public void error(String e, Exception exception){
         if(!errorHappend){
             errorHappend = true;
             hasInternet = false;
@@ -141,13 +114,17 @@ public class Frame extends JFrame implements Observer {
             if(selectedDownload != null&& selectedDownload.getStatus() == Status.DOWNLOADING){
                 selectedDownload.setStatus(Status.CANCELLED);
             }
-            jComboBox1.removeAllItems();
-            jComboBox1.addItem(new Object() {public String toString() { return "No Versions Avalible"; }});
-            jComboBox1.setSelectedIndex(0);
-            jComboBox1.setEnabled(false);
-            jTextArea1.setAutoscrolls(false);
-            jTextArea1.setText("No Changelog Avalible");
-            jButton1.setEnabled(false);
+            mainWindow.versionBox.removeAllItems();
+            mainWindow.versionBox.addItem(new Object() {
+                public String toString() {
+                    return "No Versions Avalible";
+                }
+            });
+            mainWindow.versionBox.setSelectedIndex(0);
+            mainWindow.versionBox.setEnabled(false);
+            mainWindow.changeLogArea.setAutoscrolls(false);
+            mainWindow.changeLogArea.setText("No Changelog Avalible");
+            mainWindow.downloadButton.setEnabled(false);
             if (!Main.dev) {
                 try {
                     File errorFile = new File("Steve's Carts 2 Downloader Crash Log " + getDateTime() + ".txt");
@@ -166,22 +143,25 @@ public class Frame extends JFrame implements Observer {
                 exception.printStackTrace();
                 resetStats();
             }
-        }   
+        }
     }
-    
+
     void noInternet(){
-    	jComboBox1.addItem(new Object() {public String toString() { return "No Versions Avalible"; }});
-        jComboBox1.setSelectedIndex(0);
-        jComboBox1.setEnabled(false);
-        jTextArea1.setAutoscrolls(false);
-        jTextArea1.setText("No changelog avalible");
-        jButton1.setEnabled(false);
+    	mainWindow.versionBox.addItem(new Object() {
+            public String toString() {
+                return "No Versions Avalible";
+            }
+        });
+        mainWindow.versionBox.setSelectedIndex(0);
+        mainWindow.versionBox.setEnabled(false);
+        mainWindow.changeLogArea.setText("No changelog avalible");
+        mainWindow.downloadButton.setEnabled(false);
     }
     
     private void changeLog(){
-        VersionItem item = (VersionItem) jComboBox1.getSelectedItem();
-        jTextArea1.setAutoscrolls(false);
-        jTextArea1.setText(Main.getChangelogHandler().changlogHandler(item));
+        VersionItem item = (VersionItem) mainWindow.versionBox.getSelectedItem();
+        mainWindow.changeLogArea.setAutoscrolls(false);
+        mainWindow.changeLogArea.setText(Main.getChangelogHandler().changlogHandler(item));
         setMcVersion(item);
     }
     public String getDateTime(){
@@ -192,58 +172,33 @@ public class Frame extends JFrame implements Observer {
     
     private void updateProgress(float p, Status status){
     	if(status == Status.COMPLETE){
-            jButton1.setEnabled(true);
+            mainWindow.downloadButton.setEnabled(true);
     	}else if(status == Status.DOWNLOADING){
-            jLabel7.setText((int)p+"%");
-            jProgressBar1.setValue((int)p);
+            mainWindow.downloadDoneBar.setValue((int)p);
     	}
     }
 
     private void initComponents() {
-
-        jButton1 = new JButton();
-        jButton1.setEnabled(false);
-        JButton jButton2 = new JButton();
-        jComboBox1 = new JComboBox<Object>();
-        JScrollPane jScrollPane1 = new JScrollPane();
-        jTextArea1 = new JTextArea();
-        jProgressBar1 = new JProgressBar();
-        JLabel jLabel1 = new JLabel();
-        JLabel jLabel2 = new JLabel();
-        JLabel jLabel3 = new JLabel();
-        JLabel jLabel4 = new JLabel();
-        JLabel jLabel5 = new JLabel();
-        JLabel jLabel6 = new JLabel();
-        jLabel7 = new JLabel();
-        jLabel8 = new JLabel();
-        jLabel9 = new JLabel();
-        jLabel10 = new JLabel();
-        jLabel11 = new JLabel();
-        JLabel jLabel14 = new JLabel();
-        jLabel15 = new JLabel();
-
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setName("SC2D");
         setResizable(false);
+        setContentPane(mainWindow.panel1);
+        mainWindow.downloadButton.setEnabled(false);
 
-        jButton1.setText("Download");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        mainWindow.downloadButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed();
+                downloadButtonActionPerformed();
             }
         });
-
-        jButton2.setText("Close");
-        jButton2.addActionListener(new ActionListener() {
+        mainWindow.closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jButton2ActionPerformed();
+                closeButtonActionPerformed();
             }
         });
-
-        jComboBox1.addItemListener(new ItemListener() {
+        mainWindow.versionBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent evt) {
-                jComboBox1ItemStateChanged();
+                versionBoxItemStateChanged();
             }
         });
         
@@ -252,23 +207,23 @@ public class Frame extends JFrame implements Observer {
 			@Override
 			public void keyTyped(KeyEvent arg0) {
 				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
-					jButton1ActionPerformed();
+					downloadButtonActionPerformed();
 				}
 			}
-			
+
 			@Override
 			public void keyReleased(KeyEvent arg0) {}
-			
+
 			@Override
 			public void keyPressed(KeyEvent arg0) {}
 		});
-        
-        jComboBox1.addKeyListener(new KeyListener(){
+
+        mainWindow.versionBox.addKeyListener(new KeyListener(){
 
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
-					jButton1ActionPerformed();
+					downloadButtonActionPerformed();
 				}
 			}
 
@@ -279,134 +234,14 @@ public class Frame extends JFrame implements Observer {
 			public void keyTyped(KeyEvent arg0) {}
         });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setEditable(false);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
-        jLabel1.setText("Version:");
-
-        jLabel2.setText("Size: ");
-
-        jLabel3.setText("Done:");
-
-        jLabel4.setText("Version:");
-
-        jLabel5.setText("Left: ");
-
-        jLabel6.setText("Progress:");
-        jLabel6.setToolTipText("");
-
-        jLabel7.setText("0%");
-
-        jLabel14.setText("Minecraft required:");
-
-        GroupLayout layout = new GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 32, Short.MAX_VALUE)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jProgressBar1, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel8))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel10))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel11)))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel14)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel15)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel15, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel14, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(7, 7, 7)
-                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 126, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(jProgressBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel7)))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addGap(8, 8, 8))
-                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel8))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel9))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel10))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel11))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGap(27, 27, 27))))
-        );
-
-        getAccessibleContext().setAccessibleDescription("");
-
         pack();
     }
 
-    private void jButton1ActionPerformed() {
+    private void downloadButtonActionPerformed() {
     	if(hasInternet){
             resetStats();
-            jButton1.setEnabled(false);
-            String version = jComboBox1.getSelectedItem().toString();
+            mainWindow.downloadButton.setEnabled(false);
+            String version = mainWindow.versionBox.getSelectedItem().toString();
             URL url = null;
             try {
             	url = new URL("http://dl.dropbox.com/u/46486053/StevesCarts2.0.0." + version + ".zip");
@@ -415,15 +250,15 @@ public class Frame extends JFrame implements Observer {
             }
             selectedDownload = new Download(url); 
             selectedDownload.addObserver(Frame.this);
-            jLabel8.setText(version);
+            mainWindow.downloadVersion.setText(version);
         }
     }
 
-    private void jButton2ActionPerformed() {
+    private void closeButtonActionPerformed() {
         System.exit(-1);
     }
 
-    private void jComboBox1ItemStateChanged() {
+    private void versionBoxItemStateChanged() {
         if(!firstrun){
         	if(ChangelogChecks == 0){
         		changeLog();
@@ -434,7 +269,7 @@ public class Frame extends JFrame implements Observer {
         }
     }
 
-    public void runFrame() {
+    public void runFrame() {                       
         /*
          * Create and display the form
          */
@@ -446,17 +281,6 @@ public class Frame extends JFrame implements Observer {
             }
         });
     }
-    private JButton jButton1;
-    private JComboBox<Object> jComboBox1;
-    private JLabel jLabel10;
-    private JLabel jLabel11;
-    private JLabel jLabel15;
-    private JLabel jLabel7;
-    private JLabel jLabel8;
-    private JLabel jLabel9;
-    private JProgressBar jProgressBar1;
-    private JTextArea jTextArea1;
-    
     
 	@Override
 	public void update(Observable arg0, Object arg1) {
@@ -491,9 +315,9 @@ public class Frame extends JFrame implements Observer {
                 }
             }
             updateProgress(selectedDownload.getProgress(),selectedDownload.getStatus());
-            jLabel9.setText(size+ext);
-            jLabel10.setText(done+ext);
-            jLabel11.setText(left+ext);
+            mainWindow.fileSize.setText(size+ext);
+            mainWindow.fileDone.setText(done+ext);
+            mainWindow.fileLeft.setText(left+ext);
             
         }
 	}
@@ -502,7 +326,7 @@ public class Frame extends JFrame implements Observer {
 	}
 
     public void displayBoxText(String l) {
-		jTextArea1.setText(l);
+		mainWindow.changeLogArea.setText(l);
 	}
 	
 	public StartupSimulator getStartsim() {

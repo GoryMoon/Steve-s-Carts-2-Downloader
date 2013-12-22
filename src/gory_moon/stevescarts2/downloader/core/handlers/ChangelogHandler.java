@@ -14,7 +14,7 @@ public class ChangelogHandler {
 	}
 	
 	public String changlogHandler(VersionItem item){
-        String print = "ChangeLog:\n";
+        String print = "";
         String text = item.getChange();
         
         for(int j = 0;j <= exceptions.length-1;j++){
@@ -35,7 +35,7 @@ public class ChangelogHandler {
                 printArray[i] = printArray[i].replace(apostrophe, "\'");
                 printArray[i] = printArray[i].replace(quote, "\"");
             }
-            print = print+ printArray[i]+"\n";
+            print += printArray[i]+"\n";
         }
         return print;
     }

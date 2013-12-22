@@ -36,10 +36,24 @@ public class Main {
     	instance = this;
         VersionHandler vHandler = new VersionHandler();
         Version SC2DV = vHandler.getLocalVersion();
-    	
-    	frame = new Frame();
+
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }
+        catch (ClassNotFoundException ignored) {}
+        catch (UnsupportedLookAndFeelException ignored) {}
+        catch (InstantiationException ignored) {}
+        catch (IllegalAccessException ignored) {}
+
+        MainWindow mainWindow = new MainWindow();
+    	frame = new Frame(mainWindow);
     	removeUpdateFiles();
-    	
+
         try{
         	frame.getStartsim().setText("Connecting to server");
             hasInternet = InetAddress.getByName("gorymoon.dx.am").isReachable(10000);
