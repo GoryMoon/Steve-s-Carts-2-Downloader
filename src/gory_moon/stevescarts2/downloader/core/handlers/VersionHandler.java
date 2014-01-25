@@ -37,16 +37,14 @@ public class VersionHandler {
 	
 	public Version getLocalVersion() {
 		if(localVersion == null) {
-			xmlLocalHelper.setProp();
-			localVersion = calculateVersion(xmlLocalHelper.getXMLProps("localVersion"));
+			localVersion = calculateVersion(xmlLocalHelper.getProp().getXMLProp("localVersion"));
 		}
 		return localVersion;
 	}
 	
 	public Version getRemoteVersion() {
 		if(remoteVersion == null) {
-			xmlRemoteHelper.setProp();
-			remoteVersion = calculateVersion(xmlRemoteHelper.getXMLProps("remoteVersion"));
+			remoteVersion = calculateVersion(xmlRemoteHelper.getProp().getXMLProp("remoteVersion"));
 		}
 		return remoteVersion;
 	}

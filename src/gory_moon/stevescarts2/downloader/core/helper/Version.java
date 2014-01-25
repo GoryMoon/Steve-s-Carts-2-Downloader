@@ -22,7 +22,7 @@ public class Version {
 		this.dev = 0;
 	}
 	
-	private void calcuateText() {
+	private void calculateText() {
 		if (dev != 0) {
 			text = major + "." + minor +"." + fix +".dev" + dev;
 		}else if(fix != 0){
@@ -34,7 +34,7 @@ public class Version {
 	
 	@Override
 	public String toString() {
-		calcuateText();
+		calculateText();
 		return text;
 	}
 	

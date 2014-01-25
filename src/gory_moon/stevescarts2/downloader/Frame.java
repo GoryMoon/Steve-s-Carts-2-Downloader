@@ -1,7 +1,6 @@
 package gory_moon.stevescarts2.downloader;
 
 import gory_moon.stevescarts2.downloader.core.Download;
-import gory_moon.stevescarts2.downloader.core.ExceptionThread;
 import gory_moon.stevescarts2.downloader.core.StartupSimulator;
 import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
 import gory_moon.stevescarts2.downloader.core.helper.Status;
@@ -34,24 +33,13 @@ public class Frame extends JFrame implements Observer {
 	private int ChangelogChecks = 0;
 
     private StartupSimulator startsim;
-    private static ChangelogHandler changelogHandler;
 
     public void runMain(){ 
         hasInternet = Main.gethasInternet();
         
     	if(hasInternet){
 	        if(firstrun){
-                ExceptionThread exceptionT = new ExceptionThread();
-                Thread excT = new Thread(exceptionT);
-	        	excT.start();
 
-	        	while(!ExceptionThread.isDone){
-                    try {
-					    Thread.sleep(500);
-				    } catch (InterruptedException ignored) {}
-                }
-
-                changelogHandler = exceptionT.getChangelogHandler();
 	            try {
 	                items = Main.getWebArray();
 
@@ -59,7 +47,6 @@ public class Frame extends JFrame implements Observer {
                         mainWindow.versionBox.addItem(makeObj(item));
                     }
 
-                    startsim.isRunning = false;
 	                mainWindow.versionBox.setSelectedIndex(0);
 	                firstrun = false;
 	                changeLog();
@@ -161,7 +148,7 @@ public class Frame extends JFrame implements Observer {
     private void changeLog(){
         VersionItem item = (VersionItem) mainWindow.versionBox.getSelectedItem();
         mainWindow.changeLogArea.setAutoscrolls(false);
-        mainWindow.changeLogArea.setText(Main.getChangelogHandler().changlogHandler(item));
+        mainWindow.changeLogArea.setText(ChangelogHandler.changlogHandler(item));
         setMcVersion(item);
     }
     public String getDateTime(){
@@ -320,9 +307,6 @@ public class Frame extends JFrame implements Observer {
             mainWindow.fileLeft.setText(left+ext);
             
         }
-	}
-	public static ChangelogHandler getChangelogHandler() {
-		return changelogHandler;
 	}
 
     public void displayBoxText(String l) {

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project Steves Carts 2 Downloader">
+<project default="create_run_jar" name="Create Runnable Jar for Steves Carts 2 Downloader">
 
     <property file="SC2DV.properties" prefix="SC2DV"/>
+
+    <!-- Cointains 2 paths,
+        DROPBOX = path to dropbox folder for the files
+        ANT = path to ant-contrib library-->
     <property file="SC2DPaths.properties" prefix="PATHS"/>
+
     <!-- ant-contrib is required -->
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 		<classpath>

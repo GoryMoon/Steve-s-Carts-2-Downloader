@@ -1,6 +1,5 @@
 package gory_moon.stevescarts2.downloader;
 
-import gory_moon.stevescarts2.downloader.core.handlers.ChangelogHandler;
 import gory_moon.stevescarts2.downloader.core.handlers.VersionHandler;
 import gory_moon.stevescarts2.downloader.core.helper.DebugHelper;
 import gory_moon.stevescarts2.downloader.core.helper.Version;
@@ -52,6 +51,7 @@ public class Main {
 
         MainWindow mainWindow = new MainWindow();
     	frame = new Frame(mainWindow);
+        frame.setTitle("SC2 Downloader " + SC2DV);
     	removeUpdateFiles();
 
         try{
@@ -64,9 +64,10 @@ public class Main {
         if(hasInternet){
         	frame.getStartsim().addText(": Success\nChecking if updating is needed");
             boolean needsUpdate = vHandler.getVersions().needsUpdate();
-        	frame.getStartsim().addText((needsUpdate ? ": Needs update\nChecking if should update": ": Up to date\nLoading Exeptions"));
-        	frame.setTitle("SC 2 Downloader " + SC2DV);
-            
+        	frame.getStartsim().addText((needsUpdate ? ": Needs update\nChecking if should update": ": Up to date\nLoading data"));
+        	frame.setTitle("SC2 Downloader " + SC2DV);
+
+
         	try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -74,6 +75,7 @@ public class Main {
 			}
         	
             if(!needsUpdate){
+                frame.getStartsim().isRunning = false;
                 frame.runFrame();
             }else{
                 oldVersion = true;
@@ -107,6 +109,7 @@ public class Main {
     	hasInternet = false;
 	}
     
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void removeUpdateFiles(){
         new File("Steve%27s%20Carts%202%20Downloader.jar").delete();
         new File("SC2DUpdater.jar").delete();
@@ -119,10 +122,6 @@ public class Main {
 
     public static boolean gethasInternet() {
 		return hasInternet;
-	}
-
-    public static ChangelogHandler getChangelogHandler() {
-		return Frame.getChangelogHandler();
 	}
 
     public static ArrayList<VersionItem> getWebArray() throws IOException{

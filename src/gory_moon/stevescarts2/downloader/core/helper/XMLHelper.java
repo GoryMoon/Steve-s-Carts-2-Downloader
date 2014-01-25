@@ -7,29 +7,38 @@ import java.util.Properties;
 
 public class XMLHelper {
 
-	protected static Properties properties = new Properties();
+	protected Properties properties = new Properties();
 	protected InputStream repoStream = null;
 	protected String path;
+    protected Prop prop;
 	
 	public XMLHelper(String path){
 		this.path = path;
 	}
 
-	public XMLHelper setProp() {
-		try {
-			repoStream = Main.instance.getClass().getResourceAsStream(path);
-			properties.loadFromXML(repoStream);
-			repoStream.close();
-		} catch (Exception ignored) {}
-		return this;
-	}
-	
-	public String getXMLProps(String key) {
-		return properties == null ? null: properties.getProperty(key);
+	public Prop getProp() {
+        if (prop == null) {
+            try {
+                repoStream = getStream();
+                properties.loadFromXML(repoStream);
+                repoStream.close();
+                prop = new Prop();
+            } catch (Exception ignored) {}
+        }
+
+		return prop;
 	}
 
-	public String[] convertToArray(String c, String xmlProps) {
-		return xmlProps.split(c);
-	}
+    protected InputStream getStream() throws Exception {
+        return Main.instance.getClass().getResourceAsStream(path);
+    }
+
+    public class Prop {
+
+        public String getXMLProp(String key) {
+            return properties == null ? null: properties.getProperty(key);
+        }
+
+    }
 	
 }
