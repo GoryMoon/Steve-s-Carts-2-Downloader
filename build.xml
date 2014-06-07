@@ -12,7 +12,7 @@
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 		<classpath>
 			<pathelement location="${PATHS.ANT}"/>
-	</classpath>
+	    </classpath>
 	</taskdef>
 	
 	<target name="create_run_jar">
@@ -23,7 +23,7 @@
                 <attribute name="Class-Path" value="."/>
             	<attribute name="SplashScreen-Image" value="logo.png"/>
             </manifest>
-            <fileset dir="bin"/>
+            <fileset dir="out\production\Steve-s-Carts-2-Downloader"/>
         	<fileset dir="">
         		<include name="src/**"/>
         		<exclude name="src/*.png"/>
@@ -68,9 +68,9 @@
 	
 	<target name="copyLocalVersionFile">
 		<delete file="src\gory_moon\stevescarts2\downloader\resources\SC2DV.xml" />
-		<delete file="bin\gory_moon\stevescarts2\downloader\resources\SC2DV.xml" />
+		<delete file="out\production\Steve-s-Carts-2-Downloader\gory_moon\stevescarts2\downloader\resources\SC2DV.xml" />
 			
-		<copy file="template\SC2DV.xml.template" tofile="bin\gory_moon\stevescarts2\downloader\resources\SC2DV.xml">
+		<copy file="template\SC2DV.xml.template" tofile="out\production\Steve-s-Carts-2-Downloader\gory_moon\stevescarts2\downloader\resources\SC2DV.xml">
 			<filterset>
 				<filter token="VERSION" value="${SC2DV.version}"/>
 				<filter token="SIDE" value="local"/>

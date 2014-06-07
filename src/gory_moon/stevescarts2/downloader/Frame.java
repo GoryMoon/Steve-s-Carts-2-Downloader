@@ -24,15 +24,13 @@ public class Frame extends JFrame implements Observer {
 
     MainWindow mainWindow;
 
-    ArrayList<VersionItem> items = new ArrayList<VersionItem>();
+    public ArrayList<VersionItem> items = new ArrayList<VersionItem>();
     Boolean firstrun = true;
     Boolean hasInternet = true;
 
     public static Download selectedDownload;
     public boolean errorHappend = false;
 	private int ChangelogChecks = 0;
-
-    private StartupSimulator startsim;
 
     public void runMain(){ 
         hasInternet = Main.gethasInternet();
@@ -41,11 +39,11 @@ public class Frame extends JFrame implements Observer {
 	        if(firstrun){
 
 	            try {
-	                items = Main.getWebArray();
-
                     for (VersionItem item : items) {
                         mainWindow.versionBox.addItem(makeObj(item));
                     }
+
+                    setVisible(true);
 
 	                mainWindow.versionBox.setSelectedIndex(0);
 	                firstrun = false;
@@ -65,10 +63,7 @@ public class Frame extends JFrame implements Observer {
 
         initComponents();
         setLocationRelativeTo(null);
-        setVisible(true);
-        startsim = new StartupSimulator();
-        Thread startsimT = new Thread(startsim);
-        startsimT.start();
+        setVisible(false);
     }
     private VersionItem makeObj(final VersionItem item)  {
         return new VersionItem(item) {public String toString() { return item.toString(); }};
@@ -311,9 +306,5 @@ public class Frame extends JFrame implements Observer {
 
     public void displayBoxText(String l) {
 		mainWindow.changeLogArea.setText(l);
-	}
-	
-	public StartupSimulator getStartsim() {
-		return startsim;
 	}
 }

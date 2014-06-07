@@ -8,9 +8,7 @@ import gory_moon.stevescarts2.downloader.core.items.VersionItem;
 import gory_moon.stevescarts2.downloader.update.Updater;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -26,7 +24,7 @@ public class Main {
     private static boolean isUpdating = false;
     private static boolean hasInternet = true;
 
-    public static boolean debug = false;
+    public static boolean debug = true;
     public static boolean dev = false;
 
     public static Frame frame;
@@ -50,51 +48,53 @@ public class Main {
         catch (IllegalAccessException ignored) {}
 
         MainWindow mainWindow = new MainWindow();
+
     	frame = new Frame(mainWindow);
+        Startup startup = new Startup();
         frame.setTitle("SC2 Downloader " + SC2DV);
     	removeUpdateFiles();
 
         try{
-        	frame.getStartsim().setText("Connecting to server");
+            startup.setProgressText("Connecting to server").setUnknownTime(true);
             hasInternet = InetAddress.getByName("gorymoon.dx.am").isReachable(10000);
         } catch (IOException ex) {
-        	frame.getStartsim().addText(": Failed");
         	hasInternet = false;
+            startup.setProgressText("Error connecting");
+            startup.setUnknownTime(false);
         }
         if(hasInternet){
-        	frame.getStartsim().addText(": Success\nChecking if updating is needed");
+            startup.setProgressText("Checking if updating is needed").setUnknownTime(true);
             boolean needsUpdate = vHandler.getVersions().needsUpdate();
-        	frame.getStartsim().addText((needsUpdate ? ": Needs update\nChecking if should update": ": Up to date\nLoading data"));
+            startup.setProgressText((needsUpdate ? "Checking if should update" : "Loading data")).setUnknownTime(true);
         	frame.setTitle("SC2 Downloader " + SC2DV);
 
-
-        	try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        	
             if(!needsUpdate){
-                frame.getStartsim().isRunning = false;
-                frame.runFrame();
+                runFrame();
             }else{
                 oldVersion = true;
                 int pick = JOptionPane.showConfirmDialog(null, "A update is avalible.\nOnline Version: " + vHandler.getRemoteVersion() + "\nLocal Version: " + SC2DV + "\nDo you want to download it now?",
                 "Updater", JOptionPane.YES_NO_OPTION);
                 isUpdating = (pick == 0);
-                frame.getStartsim().addText(isUpdating ? ": Updating": ": Carrying on");
+                startup.setProgressText(isUpdating ? "Updating" : "Loading data");
             }
             if(isUpdating && oldVersion){
-            	frame.getStartsim().isRunning = false;
                 new Updater();
             }else if(needsUpdate){
-                frame.runFrame();
+                runFrame();
             }
+            startup.setVisible(false);
         }else{
-        	frame.getStartsim().isRunning = false;
         	noInternet();
         	frame.runFrame();
+            startup.setVisible(false);
         }
+    }
+
+    private void runFrame() {
+        try {
+            frame.items = getWebArray();
+        } catch (IOException ignored) {}
+        frame.runFrame();
     }
     
 	/**
@@ -105,7 +105,7 @@ public class Main {
     }
     
     private static void noInternet() {
-    	Main.sendMessage("Couldn't connect to the servers! Try again later and/or check you internet connection.", "Error");
+    	Main.sendMessage("Couldn't connect to the server! Try again later and/or check you internet connection.", "Error");
     	hasInternet = false;
 	}
     
@@ -128,7 +128,8 @@ public class Main {
         String[] temp;
         URL url = new URL("http://gorymoon.dx.am/stevescarts2/versionFile.txt");
         URLConnection con = url.openConnection();
-        InputStreamReader r = new InputStreamReader(con.getInputStream(), "UTF-8");
+
+        InputStreamReader r = new InputStreamReader(new BufferedInputStream(con.getInputStream()), "UTF-8");
         StringBuilder buf = new StringBuilder();
         while (true) {
             int ch = r.read();

@@ -3,6 +3,7 @@ SC2DPaths.properties
 /.project
 /.settings/org.eclipse.jdt.core.prefs
 /.settings/org.eclipse.ltk.core.refactoring.prefs
+/.idea
+*.iml
 /Build_Main.xml
 /bin
-/template/
